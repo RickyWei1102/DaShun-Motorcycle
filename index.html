@@ -3,83 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>租車費率試算器 Pro</title>
+    <title>大順租車試算表</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; }
+    </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-4">
+<body class="bg-slate-50 min-h-screen p-4">
 
-    <div id="app" class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div class="bg-indigo-900 p-6 text-center text-white">
-            <h1 class="text-xl font-bold italic">熱血千程 伴夢行</h1>
-            <p class="text-xs opacity-75 mt-1 text-yellow-400">里程來計費．金錢不浪費</p>
+    <div id="app" class="w-full max-w-md mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <div class="bg-gradient-to-r from-blue-700 to-indigo-900 p-8 text-center text-white">
+            <h1 class="text-2xl font-black tracking-widest mb-1">大順租車試算表</h1>
+            <div class="h-1 w-12 bg-yellow-400 mx-auto rounded-full mb-2"></div>
+            <p class="text-xs opacity-80 font-light">里程計費 · 透明公開 · 專業服務</p>
         </div>
 
-        <div class="p-5 space-y-4">
-            <div class="grid grid-cols-2 gap-3">
+        <div class="p-6 space-y-5">
+            <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">車輛等級</label>
-                    <select v-model="selectedRank" class="w-full border-2 border-gray-200 rounded-lg p-2 font-medium">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">車輛等級</label>
+                    <select v-model="selectedRank" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 font-bold text-gray-700 outline-none focus:border-blue-500 transition-all">
                         <option v-for="(data, rank) in rates" :key="rank" :value="rank">{{ rank }}</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">身分</label>
-                    <select v-model="identity" class="w-full border-2 border-gray-200 rounded-lg p-2">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">使用者身分</label>
+                    <select v-model="identity" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 font-medium text-gray-700 outline-none focus:border-blue-500 transition-all">
                         <option value="member">會員</option>
                         <option v-if="rates[selectedRank].nonMember" value="nonMember">非會員</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">時段</label>
-                    <select v-model="dayType" class="w-full border-2 border-gray-200 rounded-lg p-2">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">租借時段</label>
+                    <select v-model="dayType" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 font-medium text-gray-700 outline-none focus:border-blue-500 transition-all">
                         <option value="weekday">平日</option>
                         <option value="holiday">假日</option>
                     </select>
                 </div>
             </div>
 
-            <hr>
-
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">租借天數</label>
-                    <input type="number" v-model.number="days" min="1" class="w-full border-2 border-gray-200 rounded-lg p-2">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">租借天數</label>
+                    <input type="number" v-model.number="days" min="1" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 font-bold text-gray-700 outline-none focus:border-blue-500 transition-all">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">行駛里程 (km)</label>
-                    <input type="number" v-model.number="km" min="0" class="w-full border-2 border-gray-200 rounded-lg p-2">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">預計里程 (km)</label>
+                    <input type="number" v-model.number="km" min="0" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 font-bold text-gray-700 outline-none focus:border-blue-500 transition-all">
                 </div>
             </div>
 
-            <div class="space-y-2">
-                <label class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <input type="checkbox" v-model="includeInsurance" class="w-5 h-5 text-indigo-600">
-                    <span class="text-sm font-medium text-gray-700">加購財損專案 (${{ insurancePrice }})</span>
+            <div class="space-y-3 pt-2">
+                <label class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border-2 border-transparent cursor-pointer hover:bg-blue-50 transition-colors" :class="{'border-blue-200 bg-blue-50': includeInsurance}">
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" v-model="includeInsurance" class="w-5 h-5 rounded text-blue-600 focus:ring-blue-500">
+                        <span class="text-sm font-bold text-gray-700">加購財損專案</span>
+                    </div>
+                    <span class="text-sm font-black text-blue-600">${{ insurancePrice }}</span>
                 </label>
-                <label class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <input type="checkbox" v-model="extraTime" class="w-5 h-5 text-indigo-600">
-                    <span class="text-sm font-medium text-gray-700">0900前提車 / 2100後還車 (+$200)</span>
+                
+                <label class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border-2 border-transparent cursor-pointer hover:bg-blue-50 transition-colors" :class="{'border-blue-200 bg-blue-50': extraTime}">
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" v-model="extraTime" class="w-5 h-5 rounded text-blue-600 focus:ring-blue-500">
+                        <span class="text-sm font-bold text-gray-700">早提車 / 晚還車</span>
+                    </div>
+                    <span class="text-sm font-black text-blue-600">$200</span>
                 </label>
             </div>
 
-            <div class="bg-indigo-50 p-4 rounded-xl space-y-2 border border-indigo-100">
-                <div class="flex justify-between text-sm text-gray-600">
-                    <span>出車費總計 (${{ basePrice }} x {{ days }}天)</span>
+            <div class="mt-6 bg-slate-900 rounded-3xl p-6 text-white shadow-lg">
+                <div class="flex justify-between text-xs opacity-60 mb-1">
+                    <span>基礎費用 ({{ basePrice }} x {{ days }}天)</span>
                     <span>${{ basePrice * days }}</span>
                 </div>
-                <div class="flex justify-between text-sm text-gray-600">
-                    <span>里程分段計費 ({{ km }} km)</span>
+                <div class="flex justify-between text-xs opacity-60 mb-4">
+                    <span>分段里程費 ({{ km }} km)</span>
                     <span>${{ kmCost }}</span>
                 </div>
-                <div v-if="includeInsurance || extraTime" class="flex justify-between text-sm text-gray-600">
-                    <span>附加費用</span>
-                    <span>${{ (includeInsurance ? insurancePrice : 0) + (extraTime ? 200 : 0) }}</span>
+                <div class="flex justify-between items-end">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest opacity-50 font-bold">Total Estimated</p>
+                        <p class="text-sm font-bold">應付總額</p>
+                    </div>
+                    <div class="text-4xl font-black text-yellow-400">
+                        <span class="text-sm mr-1">$</span>{{ totalPrice }}
+                    </div>
                 </div>
-                <div class="flex justify-between items-center pt-2 border-t border-indigo-200">
-                    <span class="font-bold text-indigo-900">預估應付總額</span>
-                    <span class="font-black text-2xl text-indigo-700">${{ totalPrice }}</span>
-                </div>
+            </div>
+
+            <div class="text-center">
+                <p class="text-[10px] text-gray-400 leading-relaxed italic">
+                    此金額僅供預估參考，實際報價依現場人員核對車況為準。
+                </p>
             </div>
         </div>
     </div>
@@ -89,7 +106,7 @@
         createApp({
             data() {
                 return {
-                    selectedRank: '鑽石級',
+                    selectedRank: '大師級',
                     identity: 'member',
                     dayType: 'weekday',
                     days: 1,
@@ -126,9 +143,17 @@
                     }
                 }
             },
+            watch: {
+                selectedRank(newRank) {
+                    if (!this.rates[newRank][this.identity]) {
+                        this.identity = 'member';
+                    }
+                }
+            },
             computed: {
                 basePrice() {
-                    return this.dayType === 'weekday' ? this.rates[this.selectedRank][this.identity].weekday : this.rates[this.selectedRank][this.identity].holiday;
+                    const data = this.rates[this.selectedRank][this.identity];
+                    return this.dayType === 'weekday' ? data.weekday : data.holiday;
                 },
                 insurancePrice() {
                     return this.rates[this.selectedRank][this.identity].ins;
