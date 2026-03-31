@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>租車價格計算器</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+    <div id="app" class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+        <h1 class="text-xl font-bold mb-4 text-center">租車費率試算</h1>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium">等級分類</label>
+                <select v-model="selectedRank" class="w-full border p-2 rounded">
+                    <option v-for="(data, rank) in rates" :key="rank" :value="rank">{{ rank }}</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium">身分</label>
+                <select v-model="identity" class="w-full border p-2 rounded">
+                    <option value="member">會員</option>
+                    <option value="nonMember">非會員</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium">時段</label>
+                <select v-model="dayType" class="w-full border p-2 rounded">
+                    <option value="weekday">平日 (0900-2100)</option>
+                    <option value="holiday">假日 (0900-2100)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium">總行駛里程 (km)</label>
+                <input type="number" v-model.number="km" class="w-full border p-2 rounded" placeholder="請輸入公里數">
+            </div>
+        </div>
+
+        <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+            <div class="text-lg font-bold text-blue-800">預估總金額：${{ totalPrice }}</div>
+            <p class="text-xs text-gray-500 mt-2">* 包含出車費與分段里程費，不含逾時費與保險</p>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue
+        createApp({
+            data() {
+                return {
+                    selectedRank: '鑽石級',
+                    identity: 'member',
+                    dayType: 'weekday',
+                    km: 0,
+                    // Model: 根據圖片輸入的部分資料
+                    rates: {
+                        '鑽石級': { 
+                            member: { weekday: 600, holiday: 750, km: [7, 5, 3] },
+                            nonMember: { weekday: 700, holiday: 850, km: [9, 6, 4] }
+                        },
+                        '黃金級': { 
+                            member: { weekday: 500, holiday: 650, km: [3, 3, 3] },
+                            nonMember: { weekday: 600, holiday: 750, km: [4, 4, 4] }
+                        }
+                    }
+                }
+            },
+            computed: {
+                totalPrice() {
+                    const currentRate = this.rates[this.selectedRank][this.identity];
+                    const basePrice = this.dayType === 'weekday' ? currentRate.weekday : currentRate.holiday;
+                    
+                    // 分段里程計算邏輯
+                    let kmPrice = 0;
+                    if (this.km <= 100) {
+                        kmPrice = this.km * currentRate.km[0];
+                    } else if (this.km <= 200) {
+                        kmPrice = (100 * currentRate.km[0]) + (this.km - 100) * currentRate.km[1];
+                    } else {
+                        kmPrice = (100 * currentRate.km[0]) + (100 * currentRate.km[1]) + (this.km - 200) * currentRate.km[2];
+                    }
+                    
+                    return basePrice + kmPrice;
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
