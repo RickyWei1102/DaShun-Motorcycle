@@ -8,106 +8,118 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; }
+        body { font-family: 'Noto Sans TC', sans-serif; -webkit-font-smoothing: antialiased; }
+        /* 針對手機下拉選單優化 */
+        select, input { font-size: 18px !important; } 
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen p-4">
+<body class="bg-slate-100 min-h-screen p-2 sm:p-4">
 
-    <div id="app" class="w-full max-w-md mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-        <div class="bg-gradient-to-r from-blue-800 to-indigo-950 p-8 text-center text-white">
-            <h1 class="text-2xl font-black tracking-widest mb-1">大順租車試算表</h1>
-            <div class="h-1 w-12 bg-yellow-400 mx-auto rounded-full mb-2"></div>
-            <p class="text-xs opacity-80 font-light italic">里程分段計費 · 透明公開</p>
+    <div id="app" class="w-full max-w-md mx-auto bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-200">
+        <div class="bg-gradient-to-br from-blue-700 to-indigo-900 p-8 text-center text-white">
+            <h1 class="text-3xl font-black tracking-widest mb-2">大順租車試算表</h1>
+            <div class="h-1.5 w-16 bg-yellow-400 mx-auto rounded-full mb-3"></div>
+            <p class="text-sm opacity-90 font-medium">里程計費 · 透明公開 · 專業服務</p>
         </div>
 
-        <div class="p-6 space-y-5">
-            <div class="grid grid-cols-2 gap-4">
-                <div class="col-span-2">
-                    <label class="block text-xs font-bold text-gray-400 mb-1 ml-1">車輛等級</label>
-                    <select v-model="selectedRank" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 font-bold text-gray-700 outline-none focus:border-blue-500">
+        <div class="p-6 space-y-6">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-500 mb-2 ml-1">車輛等級</label>
+                    <select v-model="selectedRank" class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl p-4 font-bold text-xl text-gray-800 outline-none focus:border-blue-500">
                         <option v-for="(data, rank) in rates" :key="rank" :value="rank">{{ rank }}</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 mb-1 ml-1">使用者身分</label>
-                    <select v-model="identity" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 font-medium text-gray-700 outline-none">
-                        <option value="member">會員</option>
-                        <option v-if="rates[selectedRank].nonMember" value="nonMember">非會員</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 mb-1 ml-1">租借時段</label>
-                    <select v-model="dayType" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 font-medium text-gray-700 outline-none">
-                        <option value="weekday">平日</option>
-                        <option value="holiday">假日</option>
-                    </select>
-                </div>
-            </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 mb-1 ml-1">租借天數</label>
-                    <input type="number" v-model.number="days" min="1" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 font-bold text-gray-700 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 mb-1 ml-1">預計里程 (KM)</label>
-                    <input type="number" v-model.number="km" min="0" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 font-bold text-gray-700 outline-none">
-                </div>
-            </div>
-
-            <div class="space-y-2 pt-2">
-                <label class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border-2 transition-all cursor-pointer" :class="includeInsurance ? 'border-blue-200 bg-blue-50' : 'border-transparent'">
-                    <div class="flex items-center space-x-3 text-sm font-bold text-gray-700">
-                        <input type="checkbox" v-model="includeInsurance" class="w-4 h-4 rounded text-blue-600">
-                        <span>加購財損專案</span>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-500 mb-2 ml-1">身分</label>
+                        <select v-model="identity" class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl p-4 font-bold text-lg text-gray-800 outline-none">
+                            <option value="member">會員</option>
+                            <option v-if="rates[selectedRank].nonMember" value="nonMember">非會員</option>
+                        </select>
                     </div>
-                    <span class="text-xs font-black text-blue-600">${{ insurancePrice }}</span>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-500 mb-2 ml-1">時段</label>
+                        <select v-model="dayType" class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl p-4 font-bold text-lg text-gray-800 outline-none">
+                            <option value="weekday">平日</option>
+                            <option value="holiday">假日</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-500 mb-2 ml-1">租借天數</label>
+                        <input type="number" v-model.number="days" min="1" class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl p-4 font-bold text-xl text-gray-800 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-500 mb-2 ml-1">預計里程 (KM)</label>
+                        <input type="number" v-model.number="km" min="0" class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl p-4 font-bold text-xl text-gray-800 outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-2">
+                <label class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border-2 transition-all cursor-pointer" :class="includeInsurance ? 'border-blue-400 bg-blue-50' : 'border-transparent'">
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" v-model="includeInsurance" class="w-6 h-6 rounded text-blue-600">
+                        <span class="text-lg font-bold text-gray-700">加購財損專案</span>
+                    </div>
+                    <span class="text-lg font-black text-blue-600">${{ insurancePrice }}</span>
                 </label>
                 
-                <div class="grid grid-cols-2 gap-2">
-                    <label class="flex items-center space-x-2 p-3 bg-slate-50 rounded-xl border-2 transition-all cursor-pointer" :class="earlyPick ? 'border-orange-200 bg-orange-50' : 'border-transparent'">
-                        <input type="checkbox" v-model="earlyPick" class="w-4 h-4 text-orange-600">
-                        <span class="text-[11px] font-bold text-gray-700">0900提前取車</span>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="flex flex-col items-center justify-center p-3 bg-slate-50 rounded-2xl border-2 transition-all cursor-pointer text-center" :class="earlyPick ? 'border-orange-400 bg-orange-50' : 'border-transparent'">
+                        <input type="checkbox" v-model="earlyPick" class="w-5 h-5 mb-1 text-orange-600">
+                        <span class="text-sm font-bold text-gray-700">0900提前取車</span>
+                        <span class="text-xs font-black text-orange-600">+$200</span>
                     </label>
-                    <label class="flex items-center space-x-2 p-3 bg-slate-50 rounded-xl border-2 transition-all cursor-pointer" :class="lateReturn ? 'border-orange-200 bg-orange-50' : 'border-transparent'">
-                        <input type="checkbox" v-model="lateReturn" class="w-4 h-4 text-orange-600">
-                        <span class="text-[11px] font-bold text-gray-700">2100延後還車</span>
+                    <label class="flex flex-col items-center justify-center p-3 bg-slate-50 rounded-2xl border-2 transition-all cursor-pointer text-center" :class="lateReturn ? 'border-orange-400 bg-orange-50' : 'border-transparent'">
+                        <input type="checkbox" v-model="lateReturn" class="w-5 h-5 mb-1 text-orange-600">
+                        <span class="text-sm font-bold text-gray-700">2100延後還車</span>
+                        <span class="text-xs font-black text-orange-600">+$200</span>
                     </label>
                 </div>
             </div>
 
-            <div class="mt-6 bg-slate-900 rounded-3xl p-6 text-white shadow-lg space-y-4">
-                <div class="space-y-1">
-                    <div class="flex justify-between text-xs opacity-60">
-                        <span>基礎費用 (${{ basePrice }} x {{ days }}天)</span>
+            <div class="mt-8 bg-slate-900 rounded-[2rem] p-8 text-white shadow-2xl space-y-4">
+                <div class="space-y-2 border-b border-slate-700 pb-4 text-sm opacity-80">
+                    <div class="flex justify-between">
+                        <span>基礎車資 ({{ basePrice }} x {{ days }}天)</span>
                         <span>${{ basePrice * days }}</span>
                     </div>
-                    <div class="flex justify-between text-xs opacity-60">
-                        <span>里程費用 ({{ km }} km)</span>
+                    <div class="flex justify-between">
+                        <span>里程費 ({{ km }} km)</span>
                         <span>${{ kmCost }}</span>
                     </div>
-                    <div class="bg-slate-800 p-2 rounded text-[10px] text-yellow-200 font-mono leading-tight border border-slate-700">
-                        計算：{{ kmFormula }}
-                    </div>
-                    <div v-if="earlyPick || lateReturn || includeInsurance" class="flex justify-between text-xs opacity-60 pt-1">
-                        <span>附加費總計</span>
+                    <div v-if="earlyPick || lateReturn || includeInsurance" class="flex justify-between text-blue-300">
+                        <span>附加費用合計</span>
                         <span>${{ (earlyPick ? 200 : 0) + (lateReturn ? 200 : 0) + (includeInsurance ? insurancePrice : 0) }}</span>
                     </div>
                 </div>
 
-                <div class="flex justify-between items-end border-t border-slate-700 pt-4">
-                    <div>
-                        <p class="text-[10px] uppercase tracking-widest opacity-40 font-bold">Total Estimated</p>
-                        <p class="text-sm font-bold text-blue-300">應付總額</p>
-                    </div>
-                    <div class="text-4xl font-black text-yellow-400">
-                        <span class="text-sm mr-1">$</span>{{ totalPrice }}
+                <div class="bg-indigo-950 p-3 rounded-xl border border-indigo-800">
+                    <p class="text-[11px] text-indigo-300 font-bold mb-1 uppercase tracking-wider">里程計算公式：</p>
+                    <p class="text-sm text-yellow-400 font-mono font-bold">{{ kmFormula }}</p>
+                </div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <span class="text-xl font-bold">預估總額</span>
+                    <div class="text-5xl font-black text-yellow-400 tracking-tighter">
+                        <span class="text-2xl mr-1">$</span>{{ totalPrice }}
                     </div>
                 </div>
             </div>
 
-            <div class="text-center">
-                <p class="text-[10px] text-gray-400 italic">實際報價依現場人員核對車況為準。</p>
+            <div class="pt-10">
+                <h3 class="text-center text-gray-400 text-sm font-bold mb-4 uppercase tracking-widest">— 原始費率對照表 —</h3>
+                <div class="rounded-2xl overflow-hidden border-4 border-gray-200 shadow-inner">
+                    <img src="https://raw.githubusercontent.com/RickyWei1102/car-rental-calc/main/9558.jpg" alt="費率表" class="w-full h-auto">
+                </div>
+                <p class="text-[11px] text-gray-400 text-center mt-4 leading-relaxed">
+                    此金額僅供預估參考，實際報價依現場人員核對車況為準。
+                </p>
             </div>
         </div>
     </div>
