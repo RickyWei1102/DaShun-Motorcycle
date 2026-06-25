@@ -28,6 +28,15 @@
                     <select v-model="selectedRank" class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl p-3 text-gray-800 outline-none focus:border-blue-500">
                         <option v-for="(data, rank) in rates" :key="rank" :value="rank">{{ rank }}</option>
                     </select>
+                    
+                    <div v-if="carModels[selectedRank]" class="mt-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+                        <label class="block text-xs font-bold text-gray-400 mb-2 ml-1">該等級可選車款</label>
+                        <div class="flex flex-wrap gap-2">
+                            <span v-for="car in carModels[selectedRank]" :key="car" class="bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full border border-blue-100">
+                                {{ car }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -116,6 +125,16 @@
                 return {
                     selectedRank: '大師級', identity: 'member', dayType: 'weekday', days: 1, km: 0,
                     includeInsurance: false, earlyPick: false, lateReturn: false,
+                    carModels: {
+                        '永恆傳說': ['GSXR1000R 特殊塗裝版'],
+                        '王者級': ['HONDA CBR1000RR', 'YAMAHA R6'],
+                        '大師級': ['SUZUKI GSXR600', 'YAMAHA MT-09 二代'],
+                        '鑽石級': ['HONDA CB650', 'APRILIA RS457'],
+                        '柏金級': ['KAWASAKI 忍者400', 'YAMAHA R3', 'HONDA CBR250RR'],
+                        '黃金級': ['HONDA CBR150R', 'HONDA CRF150'],
+                        '白銀級': ['SYM DRG 158', 'HONDA MSX 125'],
+                        '青銅級': ['KYMCO LIKE 125']
+                    },
                     rates: {
                         '永恆傳說': { member: { weekday: 1000, holiday: 1100, km: [13, 10, 7], ins: 1000 } },
                         '王者級': { member: { weekday: 700, holiday: 850, km: [10, 8, 6], ins: 500 } },
@@ -136,7 +155,6 @@
                     const d = Math.max(0, this.km);
                     if (d <= 100) return `(${d}x$${r[0]})`;
                     if (d <= 200) return `(100x$${r[0]}) + (${d-100}x$${r[1]})`;
-                    // 修正此處：第三段應為總里程減去 200
                     return `(100x$${r[0]}) + (100x$${r[1]}) + (${d-200}x$${r[2]})`;
                 },
                 kmCost() {
